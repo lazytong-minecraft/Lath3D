@@ -8,7 +8,8 @@ window.onload = function() {
     const id = getParams("id") !== null ? getParams("id") : "index";
 
     if (isError) {
-        return renderErrorPage();
+        renderErrorPage();
+        return;
     }
 
     renderHelpPage();
@@ -38,6 +39,7 @@ window.onload = function() {
             .then((response) => {
                 if (!response.ok) {
                     renderErrorPage();
+                    throw new Error("Markdown file not found");
                 }
                 return response.text();
             })
@@ -73,8 +75,8 @@ window.onload = function() {
             })
             .catch((error) => {
                 console.error("Error:", error);
-                const link = getEl("error-button");
-                link.href = "index.html#error";
+                renderErrorPage();
+                window.location.hash = "#error";
             });
     }
 };
