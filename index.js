@@ -17,12 +17,15 @@ window.onload = function() {
         errorContainer.innerHTML = `
             <div class="error-container">
                 <h1 class="error-title">404</h1>
-                <p class="error-message">Oops, there is something wrong...</p>
+                <p class="error-message">Oops，该页面不存在</p>
                 <a class="error-button" href="index.html">返回首页</a>
             </div>
         `;
         document.body.innerHTML = "";
         document.body.appendChild(errorContainer);
+
+        const link = errorContainer.querySelector(".error-button");
+        link.href = "index.html#error";
     }
 
     function renderHelpPage() {
@@ -31,14 +34,25 @@ window.onload = function() {
         const contentArea = query("#content-area");
 
         fetch(getParams("id") + ".md")
-            .then((response) => response.text())
+            .then((response) => {
+                if (!response.ok) {
+                    console.error("无法找到页面");
+                }
+                return response.text();
+            })
             .then((data) => {
                 const headings = [];
                 let pageNumber = 0;
-                const markedData = marked(data);
+                const currentYear = new Date().getFullYear();
+                const copyrightNotice = `<p style="text-align: center;">Copyright &copy; ${currentYear} LazyTong</p>`;
+                const markedData = marked(data + "\n" + copyrightNotice);
                 const tempDiv = document.createElement("div");
                 tempDiv.innerHTML = markedData;
                 const headingElements = tempDiv.querySelectorAll("h2, h3, h4, h5, h6");
+
+                headingElements.forEach((heading) => {
+                    headings.push(heading.innerText);
+                });
 
                 headingElements.forEach((heading, index) => {
                     const headingText = heading.innerText;
@@ -55,6 +69,11 @@ window.onload = function() {
 
                 titleBar.innerText = headings[pageNumber];
                 contentArea.innerHTML = markedData;
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+                const link = getEl("error-button");
+                link.href = "index.html#error";
             });
     }
 };
