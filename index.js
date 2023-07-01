@@ -5,6 +5,7 @@ window.onload = function() {
         searchParams.get(param) || searchParams.get(searchParams) || param;
     const hash = window.location.hash;
     const isError = hash === "#error";
+    const id = getParams("id") !== null ? getParams("id") : "index";
 
     if (isError) {
         return renderErrorPage();
@@ -33,10 +34,10 @@ window.onload = function() {
         const sidebar = query(".sidebar ul");
         const contentArea = query("#content-area");
 
-        fetch(getParams("id") + ".md")
+        fetch(id + ".md")
             .then((response) => {
                 if (!response.ok) {
-                    console.error("无法找到页面");
+                    renderErrorPage();
                 }
                 return response.text();
             })
