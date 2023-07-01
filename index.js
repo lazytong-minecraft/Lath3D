@@ -1,73 +1,65 @@
-window.addEventListener('DOMContentLoaded', () => {
-    const getEl = (id, doc = document) => doc.getElementById(id);
-    const query = (selector, doc = document) => doc.querySelector(selector);
-    const sidebar = query(".sidebar ul");
-    const contentArea = query("#content-area");
-    const searchBar = getEl("search-bar");
-    const searchButton = getEl("search-button");
-    const closeButton = getEl("close-button");
-    const searchResult = getEl("search-result");
-    const titleBar = getEl("title-bar");
-    const currentYear = new Date().getFullYear();
-    const renderHelpPage = async () => {
-        try {
-            const response = await fetch("index.md");
-            if (!response.ok) {
-                renderErrorPage();
-            }
-            const data = await response.text();
-            const markedData = marked(data);
-            contentArea.innerHTML = markedData + "<p style="text-align: center;">Copyright" + currentYear + "LazyTong</p>";
-            console.log("Lath3D帮助文档已加载完成");
-        } catch (error) {
-            renderErrorPage();
-        }
-    };
-    const renderErrorPage = () => {
-        const errorContainer = document.createElement("div");
-        errorContainer.innerHTML = `
-            <div class="error-container">
-                <h1 class="error-title">404</h1>
-                <p class="error-message">Oops，该页面不存在</p>
-                <a class="error-button" href="index.html">返回首页</a>
-            </div>
-        `;
-        document.body.innerHTML = "";
-        document.body.appendChild(errorContainer);
-        const link = errorContainer.querySelector(".error-button");
-        link.href = "index.html#error";
-    };
-    const performSearch = () => {
-        const keyword = searchBar.value.trim().toLowerCase();
-        const sidebarItems = Array.from(sidebar.children);
-        if (keyword === "") {
-            sidebarItems.forEach(item => item.style.display = "block");
-            searchResult.style.display = "none";
-            return;
-        };
-        const matchingItems = sidebarItems.filter(item => item.textContent.toLowerCase().includes(keyword));
-        sidebarItems.forEach(item => item.style.display = "none");
-        if (matchingItems.length === 0) {
-            searchResult.innerText = "没有找到任何相关的内容";
-            searchResult.style.display = "block";
-        } else {
-            matchingItems.forEach(item => item.style.display = "block");
-            searchResult.style.display = "none";
-        }
-    };
-    const handleSearchButtonClick = () => {
-        performSearch();
-        searchButton.style.display = "none";
-        closeButton.style.display = "block";
-    };
-    const handleCloseButtonClick = () => {
-        searchBar.value = "";
-        performSearch();
-        searchButton.style.display = "block";
-        closeButton.style.display = "none";
-    };
-    renderHelpPage();
-    searchButton.addEventListener("click", handleSearchButtonClick);
-    closeButton.addEventListener("click", handleCloseButtonClick);
-    searchBar.addEventListener("input", performSearch);
+function displayError() {
+  const error = document.getElementById("error");
+  error.innerHTML = "<h1>404</h1><p>Oops，无法找到该页面</p>";
+  error.classList.remove("hidden");
+  window.location.hash = "error";
+}
+
+function loadContent() {
+  const content = document.getElementById("content");
+
+  fetch("docs.md")
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("无法找到该页面");
+      }
+      return response.text();
+    })
+    .then((text) => {
+      content.innerHTML = marked(text);
+      generateSidebar();
+    })
+    .catch((error) => {
+      displayError();
+    });
+}
+
+function generateSidebar() {
+  const headings = document.querySelectorAll("#content h1, #content h2, #content h3, #content h4, #content h5, #content h6");
+  const nav = document.getElementById("nav");
+
+  headings.forEach((heading) => {
+    const link = document.createElement("a");
+    link.href = `#${heading.id}`;
+    link.innerText = heading.innerText;
+    nav.appendChild(link);
+  });
+
+  filterSidebar();
+}
+
+function filterSidebar() {
+  const searchInput = document.getElementById("search");
+  const sidebarItems = document.querySelectorAll("#sidebar a");
+
+  searchInput.addEventListener("keyup", (e) => {
+    const searchString = e.target.value.toLowerCase();
+
+    sidebarItems.forEach((item) => {
+      const itemText = item.textContent.toLowerCase();
+
+      if (itemText.includes(searchString)) {
+        item.style.display = "block";
+      } else {
+        item.style.display = "none";
+      }
+    });
+  });
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  const header = document.getElementById("header");
+  header.innerHTML = "<h1>Lath3D文档</h1>";
+
+  loadContent();
 });
