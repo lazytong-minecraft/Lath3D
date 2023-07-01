@@ -1,20 +1,29 @@
-window.onload = function() {
+window.addEventListener('DOMContentLoaded', () => {
     const getEl = (id, doc = document) => doc.getElementById(id);
     const query = (selector, doc = document) => doc.querySelector(selector);
-    const getParams = (param, searchParams = new URLSearchParams(window.location.search)) =>
-        searchParams.get(param) || searchParams.get(searchParams) || param;
-    const hash = window.location.hash;
-    const isError = hash === "#error";
-    const id = getParams("id") !== null ? getParams("id") : "index";
-
-    if (isError) {
-        renderErrorPage();
-        return;
-    }
-
-    renderHelpPage();
-
-    function renderErrorPage() {
+    const sidebar = query(".sidebar ul");
+    const contentArea = query("#content-area");
+    const searchBar = getEl("search-bar");
+    const searchButton = getEl("search-button");
+    const closeButton = getEl("close-button");
+    const searchResult = getEl("search-result");
+    const titleBar = getEl("title-bar");
+    const currentYear = new Date().getFullYear();
+    const renderHelpPage = async () => {
+        try {
+            const response = await fetch("index.md");
+            if (!response.ok) {
+                renderErrorPage();
+            }
+            const data = await response.text();
+            const markedData = marked(data);
+            contentArea.innerHTML = markedData + "<p style="text-align: center;">Copyright" + currentYear + "LazyTong</p>";
+            console.log("Lath3D帮助文档已加载完成");
+        } catch (error) {
+            renderErrorPage();
+        }
+    };
+    const renderErrorPage = () => {
         const errorContainer = document.createElement("div");
         errorContainer.innerHTML = `
             <div class="error-container">
@@ -25,58 +34,40 @@ window.onload = function() {
         `;
         document.body.innerHTML = "";
         document.body.appendChild(errorContainer);
-
         const link = errorContainer.querySelector(".error-button");
         link.href = "index.html#error";
-    }
-
-    function renderHelpPage() {
-        const titleBar = query("#title-bar");
-        const sidebar = query(".sidebar ul");
-        const contentArea = query("#content-area");
-
-        fetch(id + ".md")
-            .then((response) => {
-                if (!response.ok) {
-                    renderErrorPage();
-                    throw new Error("Markdown file not found");
-                }
-                return response.text();
-            })
-            .then((data) => {
-                const headings = [];
-                let pageNumber = 0;
-                const currentYear = new Date().getFullYear();
-                const copyrightNotice = `<p style="text-align: center;">Copyright &copy; ${currentYear} LazyTong</p>`;
-                const markedData = marked(data + "\n" + copyrightNotice);
-                const tempDiv = document.createElement("div");
-                tempDiv.innerHTML = markedData;
-                const headingElements = tempDiv.querySelectorAll("h2, h3, h4, h5, h6");
-
-                headingElements.forEach((heading) => {
-                    headings.push(heading.innerText);
-                });
-
-                headingElements.forEach((heading, index) => {
-                    const headingText = heading.innerText;
-                    if (index + 1 === parseInt(getParams("page"))) {
-                        pageNumber = index;
-                    }
-                    const listItem = document.createElement("li");
-                    const link = document.createElement("a");
-                    link.href = `index.html?id=${getParams("id")}&page=${index + 1}`;
-                    link.innerText = headingText;
-                    listItem.appendChild(link);
-                    sidebar.appendChild(listItem);
-                });
-
-                titleBar.innerText = headings[pageNumber];
-                contentArea.innerHTML = markedData;
-            })
-            .catch((error) => {
-                console.error("Error:", error);
-                renderErrorPage();
-                window.location.hash = "#error";
-            });
-    }
-};
+    };
+    const performSearch = () => {
+        const keyword = searchBar.value.trim().toLowerCase();
+        const sidebarItems = Array.from(sidebar.children);
+        if (keyword === "") {
+            sidebarItems.forEach(item => item.style.display = "block");
+            searchResult.style.display = "none";
+            return;
+        };
+        const matchingItems = sidebarItems.filter(item => item.textContent.toLowerCase().includes(keyword));
+        sidebarItems.forEach(item => item.style.display = "none");
+        if (matchingItems.length === 0) {
+            searchResult.innerText = "没有找到任何相关的内容";
+            searchResult.style.display = "block";
+        } else {
+            matchingItems.forEach(item => item.style.display = "block");
+            searchResult.style.display = "none";
+        }
+    };
+    const handleSearchButtonClick = () => {
+        performSearch();
+        searchButton.style.display = "none";
+        closeButton.style.display = "block";
+    };
+    const handleCloseButtonClick = () => {
+        searchBar.value = "";
+        performSearch();
+        searchButton.style.display = "block";
+        closeButton.style.display = "none";
+    };
+    renderHelpPage();
+    searchButton.addEventListener("click", handleSearchButtonClick);
+    closeButton.addEventListener("click", handleCloseButtonClick);
+    searchBar.addEventListener("input", performSearch);
+});
