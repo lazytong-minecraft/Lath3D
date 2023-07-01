@@ -1,158 +1,84 @@
+:root {
+  --blur: 10px;
+}
+
 body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: url(background.png) center center fixed no-repeat;
-    background-size: cover;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-image: url("background.png");
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 
-h1 {
-    margin: 0;
-    padding: 20px 0;
-    font-size: 30px;
-    font-weight: bold;
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(var(--blur));
+  z-index: 2;
+  text-align: center;
 }
 
-ul {
-    list-style: none;
-    padding: 0;
+.container {
+  display: flex;
+  margin: 60px 10px 10px 10px;
 }
 
-li {
-    margin-bottom: 10px;
+aside {
+  width: 25%;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(var(--blur));
+  z-index: 1;
 }
 
-a {
-    color: #42b983;
-    text-decoration: none;
+div#content {
+  width: 75%;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(var(--blur));
+  z-index: 1  ;
 }
 
-a:hover {
-    text-decoration: underline;
+input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
-::-webkit-scrollbar {
-    width: 8px;
-    background-color: #f3f3f3;
+nav {
+  display: flex;
+  flex-direction: column;
 }
 
-::-webkit-scrollbar-thumb {
-    background-color: #888;
-    border-radius: 4px;
+nav a {
+  display: block;
+  padding: 5px 0;
+  text-decoration: none;
+  color: #000;
 }
 
-::-webkit-scrollbar-thumb:hover {
-    background-color: #555;
+nav a:hover {
+  text-decoration: underline;
 }
 
-::-webkit-scrollbar-track {
-    background-color: #f3f3f3;
-    border-radius: 4px;
+#error {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(var(--blur));
+  z-index: 1;
 }
 
-.sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    width: 200px;
-    background-color: rgba(255, 255, 255, .8);
-    backdrop-filter: blur(10px);
-    padding: 20px;
-    overflow-y: auto;
-}
-
-.sidebar .search-container {
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-}
-
-.sidebar .search-input {
-    width: 100%;
-    padding: 5px;
-    border: none;
-    border-radius: 4px;
-    background-color: transparent;
-    color: #555;
-    outline: none;
-    border: 1px solid #555;
-}
-
-.sidebar .search-input:focus {
-    border-color: #42b983;
-}
-
-.sidebar .search-button {
-    margin-left: 10px;
-    padding: 5px 10px;
-    background-color: #e74c3c;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.sidebar .search-button:hover {
-    background-color: #c0392b;
-}
-
-.content {
-    margin-left: 220px;
-    margin-top: 10px;
-    margin-bottom: 10px;
-    margin-right: 10px;
-    padding: 20px;
-    background-color: rgba(255, 255, 255, .8);
-    backdrop-filter: blur(10px);
-    overflow-y: auto;
-}
-
-.error-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    background: url(background.png) center center no-repeat;
-    background-size: cover;
-    backdrop-filter: blur(10px);
-}
-
-.error-title {
-    font-size: 36px;
-    font-weight: bold;
-    margin-bottom: 20px;
-}
-
-.error-message {
-    font-size: 24px;
-    margin-bottom: 20px;
-}
-
-.error-button {
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: #42b983;
-    color: #fff;
-    font-size: 16px;
-    border-radius: 4px;
-    text-decoration: none;
-    transition: background-color .3s ease;
-}
-
-.error-button:hover {
-    background-color: #359e73;
-}
-
-.scrollbar-container {
-    position: relative;
-    height: calc(100vh - 60px);
-    overflow-y: auto;
-}
-
-hr {
-    margin-top: 10px;
-    margin-bottom: 10px;
-    border: 0;
-    border-top: 1px solid #ddd;
+.hidden {
+  display: none;
 }
